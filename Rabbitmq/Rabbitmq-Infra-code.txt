@@ -1,0 +1,38 @@
+- Login to the RabbitMQ vm and switch to root with sudo -i:
+- Update OS with latest patches
+ ~ yum update -y
+- Set EPEL Repository
+  ~ yum install epel-release -y
+- Install Erlang: RabbitMQ requires Erlang. Add the Erlang repository and install it:
+	~ sudo yum install -y epel-release
+	~ sudo yum install -y erlang
+- Add the RabbitMQ Repository:
+ ~ sudo rpm --import https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+ ~ sudo curl -o /etc/yum.repos.d/rabbitmq.repo https://packagecloud.io/rabbitmq/rabbitmq-server/el/7/x86_64/rabbitmq-server.repo
+
+- Install RabbitMQ Server:
+ ~ sudo yum install -y rabbitmq-server
+- Enable and Start RabbitMQ:
+ ~ sudo systemctl enable rabbitmq-server
+ ~ sudo systemctl start rabbitmq-server
+- Setup access to user test and make it admin:
+ ~ echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config
+ ~ rabbitmqctl add_user test test 
+ ~ rabbitmqctl set_user_tags test administrator
+ ~ systemctl restart rabbitmq-server
+- Starting the firewall and allowing the port 5672 to access rabbitmq:
+ ~ systemctl start firewalld
+ ~ systemctl enable firewalld
+ ~ firewall-cmd --get-active-zones
+ ~ firewall-cmd --add-port=5672/tcp
+ ~ firewall-cmd --runtime-to-permanent
+ ~ systemctl start rabbitmq-server
+ ~ systemctl enable rabbitmq-server
+ ~ sudo systemctl status rabbitmq-server
+- Enable the RabbitMQ Management Console (Optional): If you'd like to use the management console, enable the plugin:
+ ~ sudo rabbitmq-plugins enable rabbitmq_management
+- Open the HTTP Port (15672):
+ ~ sudo firewall-cmd --permanent --add-port=15672/tcp
+ ~ sudo firewall-cmd --reload
+
+
